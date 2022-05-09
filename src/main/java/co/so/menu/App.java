@@ -2,6 +2,7 @@ package co.so.menu;
 
 public class App {
     public static void main( String[] args ){
+    	MultiStock multiStock = new MultiStock();
 //    	Run run = new Run();
 //    	run.run();
     	
@@ -14,7 +15,14 @@ public class App {
         
         Runnable task2 = new Runnable() {
             public void run() {
-            	
+            	while(true) {
+            		try {
+						Thread.sleep(10000);
+						multiStock.run();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+            	}
             }
         };
         
@@ -23,6 +31,5 @@ public class App {
         
         subTread1.start();
         subTread2.start();
-        
     }
 }

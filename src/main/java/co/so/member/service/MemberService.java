@@ -8,4 +8,6 @@ public interface MemberService {
 
 	MemberVO login(MemberVO vo);
 
+	int memberMoneyUpdate(MemberVO login);
+
 }

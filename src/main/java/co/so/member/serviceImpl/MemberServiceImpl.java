@@ -66,4 +66,22 @@ public class MemberServiceImpl implements MemberService{
 	
 	}
 
+	@Override
+	public int memberMoneyUpdate(MemberVO login) {
+		int result = 0;
+		String sql = "UPDATE MEMBER SET MEMBERMONEY = ? WHERE MEMBERID = ?";
+		
+		try {
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, login.getMemberMoney());
+			psmt.setString(2, login.getMemberId());
+			
+			result = psmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
 }
