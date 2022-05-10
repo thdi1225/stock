@@ -16,7 +16,7 @@ import co.so.stock.serviceImpl.StockServiceImpl;
 import co.so.stock.serviceImpl.TempStockServiceImpl;
 import co.so.stock.vo.StockVO;
 
-public class MemberLogin {
+public class MemberLoginMenu {
 	private Scanner scn = new Scanner(System.in);
 	MemberService memberService = new MemberServiceImpl();
 	TempStockService tempStockService = new TempStockServiceImpl();
@@ -41,6 +41,9 @@ public class MemberLogin {
 				stockSell(login);
 				break;
 			case 5:
+				memberInfo(login);
+				break;
+			case 6:
 				isTrue = false;
 				break;
 			default:
@@ -50,11 +53,15 @@ public class MemberLogin {
 		}
 	}
 	
+	private void memberInfo(MemberVO login) {
+		login = memberService.login(login);
+		System.out.printf("id : %s | 이름 : %s | 소지금 : %d \n", login.getMemberId(), login.getMemberName(), login.getMemberMoney());
+	}
 
 	private int memberLogin() {
 		int subMenuNum = 0;
 		System.out.println("=================================================================");
-		System.out.println("====    1.전체 주식목록 2.내 주식목록 3.주식구매 4.주식판매 5.로그아웃    ====");
+		System.out.println("==  1.전체 주식목록 2.내 주식목록 3.주식구매 4.주식판매 5.내 정보 6.로그아웃  ==");
 		System.out.println("=================================================================");
 		
 		try {
@@ -71,34 +78,44 @@ public class MemberLogin {
 		System.out.print("이름 : ");
 		String name = scn.nextLine();
 		System.out.print("개수 : ");
-		int count = Integer.parseInt(scn.nextLine());
+		int count = 0;
+		
+		try{
+			count = Integer.parseInt(scn.nextLine());
+		}catch(Exception e) {
+			System.out.println("잘못된 값을 입력하였습니다.");
+		}
 		
 		StockVO stockVO = new StockVO();
 		stockVO.setStockName(name);
 		stockVO = stockService.stockSelect(stockVO);
+
+		int price = (stockVO.getStockPrice() * count);
 		
-		int price = stockVO.getStockPrice() * count;
-		
-		if(login.getMemberMoney() - price > 0) {
-			login.setMemberMoney(login.getMemberMoney() - price);
-			memberService.memberMoneyUpdate(login);
+		if(stockVO.getStockName() != null) {
+			if((login.getMemberMoney() - price) > 0) {
+				
+				login.setMemberMoney(login.getMemberMoney() - price);
+				memberService.memberMoneyUpdate(login);
+				
+				MemberStockVO memberStockVO = new MemberStockVO();
+				memberStockVO.setMemberId(login.getMemberId());
+				memberStockVO.setStockName(name);
+				memberStockVO.setCount(count);
 			
-			MemberStockVO memberStockVO = new MemberStockVO();
-			memberStockVO.setMemberId(login.getMemberId());
-			memberStockVO.setStockName(name);
-			memberStockVO.setCount(count);
-		
-			MemberStockVO memberStockVO2 = memberStockService.stockSelect(memberStockVO);
-			if(memberStockVO2.getStockName() == null) {
-				memberStockService.stockBuyInsert(memberStockVO);
+				MemberStockVO memberStockVO2 = memberStockService.stockSelect(memberStockVO);
+				if(memberStockVO2.getStockName() == null) {
+					memberStockService.stockBuyInsert(memberStockVO);
+				}else {
+					memberStockVO2.setCount(memberStockVO2.getCount() + count);
+					memberStockService.stockBuyUpdate(memberStockVO2);
+				}
 			}else {
-				memberStockVO2.setCount(count);
-				memberStockService.stockBuyUpdate(memberStockVO2);
+				System.out.println("돈이 부족합니다.");
 			}
 		}else {
-			System.out.println("돈이 부족합니다.");
+			System.out.println("없는 주식입니다.");
 		}
-		
 	}
 
 	private void stockSell(MemberVO login) {
@@ -106,7 +123,13 @@ public class MemberLogin {
 		System.out.print("이름 : ");
 		String name = scn.nextLine();
 		System.out.print("개수 : ");
-		int count = Integer.parseInt(scn.nextLine());
+		int count = 0;
+		
+		try{
+			count = Integer.parseInt(scn.nextLine());
+		}catch(Exception e) {
+			System.out.println("잘못된 값을 입력하였습니다.");
+		}
 		
 		MemberStockVO memberStockVO = new MemberStockVO();
 		memberStockVO.setMemberId(login.getMemberId());
@@ -135,8 +158,10 @@ public class MemberLogin {
 			MemberVO memberVO = new MemberVO();
 			memberVO.setMemberId(login.getMemberId());
 			memberVO.setMemberMoney(login.getMemberMoney() + price);
-			
+
 			memberService.memberMoneyUpdate(memberVO);
+		}else if(memberStockVO2.getStockName() == null){
+			System.out.println("없는 주식입니다.");
 		}else {
 			System.out.println("가지고 계신 주식 수 보다 많습니다. 다시 입력하세요.");
 		}
@@ -148,16 +173,6 @@ public class MemberLogin {
 		for(MemberStockDTO vo : list) {
 			System.out.printf("이름 : %-5s | 가격 : %d | 수량 : %d \n", vo.getStockName(), vo.getStockPrice(), vo.getCount());
 		}
-		/*
-		 * StockVO vo = new StockVO(); System.out.println("검색할 주식의 이름을 입력하세요.");
-		 * System.out.print("이름 : "); String name = scn.nextLine();
-		 * vo.setStockName(name);
-		 * 
-		 * vo = stockService.stockSelect(vo);
-		 * System.out.printf("번호 : %-5s | 이름 : %-10s | 가격 : %d | 상한가 : %d | 하한가 : %d \n"
-		 * , vo.getStockNum(), vo.getStockName(), vo.getStockPrice(), vo.getStockHigh(),
-		 * vo.getStockLow());
-		 */
 	}
 	
 	private void stockSelectList() {

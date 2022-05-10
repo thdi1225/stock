@@ -15,8 +15,8 @@ public class MainMenu {
 	MemberService memberService = new MemberServiceImpl();
 	TempStockService tempStockService = new TempStockServiceImpl();
 	StockService stockService = new StockServiceImpl();
-	AdminLogin adminLogin = new AdminLogin();
-	MemberLogin memberLogin = new MemberLogin();
+	AdminLoginMenu adminLogin = new AdminLoginMenu();
+	MemberLoginMenu memberLogin = new MemberLoginMenu();
 	public void run() {
 		mainMenu();
 	}

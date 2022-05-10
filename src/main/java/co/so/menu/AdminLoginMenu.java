@@ -13,7 +13,7 @@ import co.so.stock.serviceImpl.TempStockServiceImpl;
 import co.so.stock.vo.StockVO;
 import co.so.stock.vo.TempStockVO;
 
-public class AdminLogin {
+public class AdminLoginMenu {
 	private Scanner scn = new Scanner(System.in);
 	MemberService memberService = new MemberServiceImpl();
 	TempStockService tempStockService = new TempStockServiceImpl();
@@ -78,14 +78,19 @@ public class AdminLogin {
 		double upAndDown = Double.parseDouble(scn.nextLine());
 		
 		TempStockVO tempStockVO = tempStockService.tempStockSelect(name);
-		StockVO vo = new StockVO();
+		if(tempStockVO.getTempStockName() != null) {
+			StockVO vo = new StockVO();
+			
+			vo.setStockNum(tempStockVO.getTempStockNum());
+			vo.setStockName(tempStockVO.getTempStockName());
+			vo.setStockPrice(tempStockVO.getTempStockPrice());
+			vo.setUpAndDown(upAndDown);
+			
+			stockService.stockInsert(vo);
+		}else {
+			System.out.println("없는 주식입니다.");
+		}
 		
-		vo.setStockNum(tempStockVO.getTempStockNum());
-		vo.setStockName(tempStockVO.getTempStockName());
-		vo.setStockPrice(tempStockVO.getTempStockPrice());
-		vo.setUpAndDown(upAndDown);
-		
-		stockService.stockInsert(vo);
 	}
 	
 	private void stockUpdate() {
@@ -106,7 +111,10 @@ public class AdminLogin {
 		vo.setStockName(name);
 		vo.setUpAndDown(upAndDown);
 		
-		stockService.stockUpdate(vo);
+		int result = stockService.stockUpdate(vo);
+		if(result == 0) {
+			System.out.println("없는 주식입니다.");
+		}
 	}
 
 	private void stockDelete() {
@@ -123,6 +131,9 @@ public class AdminLogin {
 		StockVO vo = new StockVO();
 		vo.setStockName(name);
 		
-		stockService.stockDelete(vo);
+		int result = stockService.stockDelete(vo);
+		if(result == 0) {
+			System.out.println("없는 주식입니다.");
+		}
 	}
 }

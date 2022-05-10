@@ -15,5 +15,11 @@ public interface StockService {
 	int stockDelete(StockVO vo);
 
 	StockVO stockSelect(StockVO vo);
+
+	int stockPriceUpdate(StockVO vo);
+
+	List<StockVO> stockJoinSelectList();
+
+	int initUpdate(StockVO vo);
 	
 }
